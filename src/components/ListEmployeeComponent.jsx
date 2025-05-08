@@ -16,14 +16,14 @@ const ListEmployeeComponent = () => {
       });
   }, []);
 
-
   const addNewEmployee = () => {
-    navigator("/add-employee")
-
-  }
+    navigator("/add-employee");
+  };
 
   return (
     <div className="container">
+      <br />
+      <br />
       <h2 className="text-center">List of Employees</h2>
       <button
         className="btn btn-primary mb-2"
