@@ -1,6 +1,7 @@
-import React, { useState } from "react";
-import { createEmployee } from "../services/EmployeeService";
+import React, { useState, useEffect } from "react";
+import { createEmployee, updateEmployee } from "../services/EmployeeService";
 import { useNavigate, useParams } from "react-router-dom";
+import { getEmployee } from "../services/EmployeeService";
 
 const EmployeeComponent = () => {
   const [firstName, setFirstName] = useState("");
@@ -14,17 +15,46 @@ const EmployeeComponent = () => {
   });
   const navigator = useNavigate();
 
-  const saveEmployee = (event) => {
+  useEffect(() => {
+    if (id) {
+      getEmployee(id)
+        .then((response) => {
+          setFirstName(response.data.firstName);
+          setLastName(response.data.lastName);
+          setEmail(response.data.email);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  }, [id]);
+
+  const saveOrUpdateEmployee = (event) => {
     event.preventDefault();
 
     if (validateForm()) {
       // Bundle all stages(firstName, lastName, email into 1 particular object prepare for API call to backend)
       const employee = { firstName, lastName, email };
 
-      createEmployee(employee).then((response) => {
-        console.log(response.data);
-        navigator("/employees");
-      });
+      if (id) {
+        updateEmployee(id, employee)
+          .then((response) => {
+            console.log(response.data);
+            navigator("/employees");
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      } else {
+        createEmployee(employee)
+          .then((response) => {
+            console.log(response.data);
+            navigator("/employees");
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
     }
   };
 
@@ -126,7 +156,10 @@ const EmployeeComponent = () => {
                   <div className="invalid-feedback">{errors.email}</div>
                 )}
               </div>
-              <button className="btn btn-success" onClick={saveEmployee}>
+              <button
+                className="btn btn-success"
+                onClick={saveOrUpdateEmployee}
+              >
                 Submit
               </button>
             </form>
